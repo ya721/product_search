@@ -1,0 +1,24 @@
+gantt
+    title エスカレーション緊急度別対応時間SLA
+    dateFormat X
+    axisFormat %M分
+
+    section 緊急対応(30分以内)
+    Phase 1           :done, phase1_urgent, 0, 5
+    Phase 2           :done, phase2_urgent, 5, 15
+    Phase 3           :done, phase3_urgent, 15, 30
+
+    section 高優先度(2時間以内)
+    Phase 1           :done, phase1_high, 0, 15
+    Phase 2           :done, phase2_high, 15, 75
+    Phase 3           :done, phase3_high, 75, 120
+
+    section 中優先度(8時間以内)
+    Phase 1           :done, phase1_medium, 0, 60
+    Phase 2           :done, phase2_medium, 60, 300
+    Phase 3           :done, phase3_medium, 300, 480
+
+    section 低優先度(24時間以内)
+    Phase 1           :done, phase1_low, 0, 180
+    Phase 2           :done, phase2_low, 180, 900
+    Phase 3           :done, phase3_low, 900, 1440

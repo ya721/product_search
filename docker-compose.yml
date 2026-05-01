@@ -1,0 +1,26 @@
+services:
+
+  # 開発環境（現在のDockerfileをそのまま使用）
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    volumes:
+      - .:/workspaces/template
+    command: sleep infinity
+
+  # Serena MCP サーバー（ホスト環境非依存）
+  serena:
+    image: ghcr.io/oraios/serena:latest
+    ports:
+      - "9121:9121"    # MCP HTTP エンドポイント
+      - "24282:24282"  # Serena ダッシュボード
+    volumes:
+      - .:/workspace
+    command: [
+      "serena", "start-mcp-server",
+      "--transport", "streamable-http",
+      "--port", "9121",
+      "--host", "0.0.0.0",   # コンテナ外からの接続を許可
+      "--project", "/workspace"
+    ]

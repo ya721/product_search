@@ -1,0 +1,72 @@
+# requirements.txt の目的と責務
+# - 目的: プロジェクトで必要な Python パッケージを明示し、`pip install -r requirements.txt` で依存関係を再現可能にインストールできるようにする。
+# - 範囲: 本ファイルは「実行時（production）のトップレベル依存」を表すことを推奨する。開発用依存は別ファイル（例: requirements-dev.txt）に分離する。
+#
+# 推奨される運用ポリシー（責務）
+# - 固定化: 可能な限りバージョンを固定する（例: `package==1.2.3`）して、再現性を担保する。
+# - ハッシュ検証: セキュリティと完全性のためにハッシュを使う（`--hash=sha256:...`）ことを検討する。
+# - トップレベルのみ: トップレベル依存のみを列挙し、トランジティブ依存はロックファイル（pip-tools の requirements.txt 出力や Poetry/Poetry lock）で管理する。
+# - 環境分離: 開発・CI・本番で必要なパッケージが異なる場合は `requirements-dev.txt` や `requirements-ci.txt` を用意する。
+# - 更新フロー: 依存更新はローカルでテストしてから PR を作成する。自動更新ツール（Dependabot, Renovate）や `pip-compile` を使うと安全。
+# - セキュリティ監査: 定期的に `pip-audit` や `safety` などで脆弱性スキャンを行う。
+# - プラットフォーム依存: OS や Python バージョンごとの制約がある場合は PEP 508 マーカーを使う（例: `package; sys_platform == "win32"`）。
+#
+# フォーマットと使用法メモ
+# - コメントは行頭 `#`。空行は可。パッケージ指定は `name==version` を基本とする。
+# - 編集可能インストール: `-e git+https://...#egg=package` を使用可能だが、CI/本番では避けることが望ましい。
+# - インストール: `python -m pip install --upgrade pip && python -m pip install -r requirements.txt`
+# - ロック・生成: `pip-compile`（pip-tools）や `pip freeze > requirements.txt`（ただし freeze は全依存を列挙する）を利用。
+# - 制約ファイル: 共通制約を使う場合は `pip install -r requirements.txt -c constraints.txt` を活用。
+#
+# 注意事項
+# - 大きなバイナリやサードパーティの wheel を Git にコミットしない。必要な場合はアーティファクトリやパッケージレジストリを使う。
+# - requirements.txt は「実行可能な仕様書」ではなく「インストール指示書」である点を忘れない（依存のテスト・検証は別プロセスで行う）。
+#
+# 参考コマンド
+# - インストール: `python -m pip install -r requirements.txt`
+# - 開発依存のインストール: `python -m pip install -r requirements-dev.txt`
+# - 依存更新（pip-tools）: `pip-compile requirements.in` -> `pip-sync`
+# - セキュリティ監査: `pip-audit`
+#
+# ここから下にパッケージを列挙してください（例）
+# requests==2.31.0
+# ...existing packages...
+
+# pandas
+# 役割: データフレームベースのデータ操作ライブラリ
+# 責務: CSV/Excel等の入出力、データの整形・変換・集計・結合・フィルタリング、時系列処理など
+#       データ処理パイプラインの中核コンポーネントとして使用されます（読み込み後の前処理やMarkdown変換の元データ準備等）。
+# ドキュメント: https://pandas.pydata.org/docs/
+pandas==3.0.0
+
+# openpyxl
+# 役割: Excel (.xlsx) ファイルの読み書きを行うライブラリ
+# 責務: ワークブック/シート/セル操作、スタイル・数式の読み書き、pandas の Excel I/O のバックエンドとして利用されることが多い
+#       （本プロジェクトではExcelからのデータ抽出に必要）。
+# ドキュメント: https://openpyxl.readthedocs.io/
+# openpyxl==3.1.5
+ 
+# validators
+# 役割: URL 等の入力検証に使う小さなユーティリティライブラリ
+# 参照: https://pypi.org/project/validators/
+validators
+
+# playwright
+# 役割: Playwright を使ったブラウザ自動化（スクリーンショット取得など）。
+# 備考: Playwright はブラウザバイナリの別途インストールが必要です（`python -m playwright install`）。
+# 参照: https://playwright.dev/python/
+playwright
+
+# anthropic
+# 役割: Anthropic Claude API を使用するための公式 Python クライアントライブラリ
+# 責務: Claude モデル（Claude 3.5 Sonnet, Claude 3 Opus など）への API リクエスト送信とレスポンス処理
+#       テキスト生成、会話、ストリーミング、関数呼び出し（Function Calling）などの機能を提供
+# ドキュメント: https://docs.anthropic.com/claude/reference/client-libraries
+# 参照: https://pypi.org/project/anthropic/
+anthropic
+
+# pytest
+# 役割: Python のテストフレームワーク
+# 責務: ユニットテスト/統合テストの実行、アサーション、フィクスチャ管理
+# 参照: https://docs.pytest.org/
+pytest
